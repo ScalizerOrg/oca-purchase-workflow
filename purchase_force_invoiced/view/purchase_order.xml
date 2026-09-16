@@ -11,11 +11,12 @@
             <field name="invoice_status" position="after">
                 <field
                     name="force_invoiced"
-                    groups="purchase.group_purchase_manager"
+                    groups="purchase_force_invoiced.group_force_purchase_invoiced"
                     invisible="state not in ('purchase', 'done')"
                     readonly="state != 'done'"
                     widget="boolean_toggle"
                 />
+                <!--groups="purchase.group_purchase_manager"-->
             </field>
         </field>
     </record>

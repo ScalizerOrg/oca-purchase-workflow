@@ -12,6 +12,6 @@
     "license": "AGPL-3",
     "website": "https://github.com/OCA/purchase-workflow",
     "depends": ["purchase"],
-    "data": ["view/purchase_order.xml"],
+    "data": ["security/security.xml", "view/purchase_order.xml"],
     "installable": True,
 }
