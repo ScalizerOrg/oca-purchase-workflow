@@ -67,7 +67,10 @@ class PurchaseOrderLine(models.Model):
                 moves_to_assign.with_context(
                     purchase_delivery_split_date=True
                 )._assign_picking()
-                moves_to_assign._action_confirm()
+                # _action_confirm() may merge moves (e.g. the attached and the
+                # extra move of a line with downstream moves) and unlink the
+                # merged ones: keep only the returned records.
+                moves_to_assign = moves_to_assign._action_confirm()
                 moves += moves_to_assign
         return moves
 

@@ -503,3 +503,57 @@ class TestDeliverySingle(PurchaseTestCommon):
 
         for move in moves_after - new_move:
             self.assertEqual(move.date, Datetime.to_datetime(self.date_sooner))
+
+
+class TestDeliverySplitMergedMoves(PurchaseTestCommon):
+    def test_split_date_with_partial_downstream_moves(self):
+        """A line partially linked to downstream moves gets two moves (the
+        attached one and an extra one) which are merged on confirmation.
+        The merged move is unlinked and must not be used afterwards.
+        """
+        product = self.env["product.product"].create(
+            {"name": "Test Product", "type": "consu", "standard_price": 10}
+        )
+        order = self.env["purchase.order"].create(
+            {
+                "partner_id": self.vendor.id,
+                "order_line": [
+                    Command.create(
+                        {
+                            "product_id": product.id,
+                            "product_uom_id": product.uom_id.id,
+                            "name": product.name,
+                            "price_unit": 10.0,
+                            "date_planned": "2015-01-01",
+                            "product_qty": 1.0,
+                        },
+                    ),
+                    Command.create(
+                        {
+                            "product_id": product.id,
+                            "product_uom_id": product.uom_id.id,
+                            "name": product.name,
+                            "price_unit": 10.0,
+                            "date_planned": "2015-12-13",
+                            "product_qty": 10.0,
+                        },
+                    ),
+                ],
+            }
+        )
+        downstream_move = self.env["stock.move"].create(
+            {
+                "product_id": product.id,
+                "product_uom_qty": 6.0,
+                "product_uom": product.uom_id.id,
+                "location_id": order.picking_type_id.warehouse_id.lot_stock_id.id,
+                "location_dest_id": self.env.ref("stock.stock_location_customers").id,
+            }
+        )
+        # The line handled by the second date group has partial downstream moves
+        order.order_line[1].move_dest_ids = downstream_move
+        order.button_confirm()
+        self.assertEqual(order.state, "purchase")
+        self.assertEqual(len(order.picking_ids), 2)
+        line = order.order_line[1]
+        self.assertEqual(sum(line.move_ids.mapped("product_uom_qty")), 10.0)
