@@ -8,7 +8,6 @@ class PurchaseOrder(models.Model):
 
     incoterm_address_id = fields.Many2one(
         comodel_name="res.partner",
-        string="Incoterm Address",
         help="Address where goods responsibility is transferred to the buyer",
     )
 
@@ -18,5 +17,8 @@ class PurchaseOrder(models.Model):
         self.incoterm_id = self.partner_id.commercial_partner_id.purchase_incoterm_id
         self.incoterm_address_id = (
             self.partner_id.commercial_partner_id.purchase_incoterm_address_id
+        )
+        self.incoterm_location = (
+            self.partner_id.commercial_partner_id.purchase_incoterm_location
         )
         return res
