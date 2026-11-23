@@ -7,6 +7,8 @@ from odoo.addons.base.tests.common import BaseCommon
 
 
 class TestSalePurchaseForceVendorBase(BaseCommon):
+    _test_user_groups = None
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -14,9 +16,11 @@ class TestSalePurchaseForceVendorBase(BaseCommon):
         cls.vendor_a = cls.env["res.partner"].create({"name": "Test vendor A"})
         cls.vendor_b = cls.env["res.partner"].create({"name": "Test vendor B"})
         cls.mto = cls.env.ref("stock.route_warehouse0_mto")
-        cls.mto.active = True
+        cls.mto.write(
+            {"active": True, "product_selectable": True, "sale_selectable": True}
+        )
         cls.buy = cls.env.ref("purchase_stock.route_warehouse0_buy")
-        cls.buy.sale_selectable = True
+        cls.buy.write({"sale_selectable": True, "product_selectable": True})
         cls.product_a = cls.env["product.product"].create(
             {
                 "name": "Test product A",

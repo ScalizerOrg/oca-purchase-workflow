@@ -29,5 +29,5 @@ class TestSalePurchaseForceVendor(TestSalePurchaseForceVendorBase):
     def test_misc_not_force_vendor_restrict(self):
         self.env.company.sale_purchase_force_vendor_restrict = False
         self.sale_order.action_confirm()
-        self.assertEqual(self.sol_a.vendor_id_domain, [])
-        self.assertEqual(self.sol_b.vendor_id_domain, [])
+        self.assertFalse(self.sol_a.vendor_id_domain)
+        self.assertFalse(self.sol_b.vendor_id_domain)

@@ -12,12 +12,8 @@ class SaleReport(models.Model):
         readonly=True,
     )
 
-    def _select_additional_fields(self):
-        res = super()._select_additional_fields()
-        res["vendor_id"] = "l.vendor_id"
-        return res
+    def _select_dict(self, table):
+        return super()._select_dict(table) | {"vendor_id": table.vendor_id}
 
-    def _group_by_sale(self):
-        group_by = super()._group_by_sale()
-        group_by += ", l.vendor_id"
-        return group_by
+    def _groupby_list(self, table):
+        return super()._groupby_list(table) + [table.vendor_id]
